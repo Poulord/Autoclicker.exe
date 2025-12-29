@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Asistente de Actividad Laboral</title>
+  <meta name="description" content="Herramienta sencilla para copiar un script de PowerShell sin instalaciones. Diseño corporativo, responsive y fácil de usar." />
+  <style>
+    :root{
+      --ms-blue:#0078D4;
+      --ms-blue-2:#106EBE;
+      --bg:#F6F8FB;
+      --card:#FFFFFF;
+      --text:#0F172A;
+      --muted:#475569;
+      --border:#E5EAF2;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .08);
+      --radius: 16px;
+      --code-bg:#0B1220;
+      --code-border: rgba(255,255,255,.08);
+      --success:#16a34a;
+      --warning:#f59e0b;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Segoe UI", Roboto, system-ui, -apple-system, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% -10%, rgba(0,120,212,.16), transparent 60%),
+        radial-gradient(900px 500px at 90% 0%, rgba(16,110,190,.10), transparent 50%),
+        var(--bg);
+      line-height:1.55;
+    }
+
+    a{color:var(--ms-blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    .container{
+      width:min(1100px, 92vw);
+      margin:0 auto;
+      padding:32px 0 56px;
+    }
+
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:6px 0 20px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+
+    .brand-badge{
+      width:40px;height:40px;
+      border-radius:12px;
+      background: linear-gradient(135deg, var(--ms-blue), var(--ms-blue-2));
+      box-shadow: 0 10px 24px rgba(0,120,212,.22);
+      display:grid; place-items:center;
+      color:white;
+      user-select:none;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.65);
+      backdrop-filter: blur(10px);
+      color:var(--muted);
+      font-size:14px;
+      white-space:nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:22px;
+      align-items:stretch;
+      margin-top:10px;
+    }
+
+    @media (max-width: 920px){
+      .grid{grid-template-columns: 1fr; }
+      header{flex-direction:column; align-items:flex-start}
+      .pill{white-space:normal}
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .hero{
+      padding:28px 28px 22px;
+      position:relative;
+    }
+
+    .hero h1{
+      margin:0 0 10px;
+      font-size: clamp(28px, 3.4vw, 42px);
+      line-height:1.1;
+      letter-spacing:-.4px;
+    }
+
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      font-size: clamp(15px, 1.4vw, 18px);
+    }
+
+    .hero .trust{
+      margin-top:16px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .trust .mini{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#fff;
+      color:#0b1220;
+      font-weight:600;
+      font-size:13px;
+    }
+
+    .code-card{
+      padding:18px;
+    }
+
+    .code-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:12px;
+    }
+
+    .code-header h2{
+      margin:0;
+      font-size:18px;
+      letter-spacing:-.2px;
+    }
+
+    .code-header p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .code-block{
+      position:relative;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.00)),
+                  var(--code-bg);
+      border:1px solid var(--code-border);
+      border-radius:14px;
+      padding:16px 14px 14px;
+      overflow:auto;
+    }
+
+    pre{
+      margin:0;
+      color:#E7EEF8;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:13px;
+      line-height:1.55;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .code-actions{
+      margin-top:12px;
+      display:flex;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      border-radius:14px;
+      padding:14px 16px;
+      font-weight:800;
+      font-size:16px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+      user-select:none;
+    }
+
+    .btn-primary{
+      background: linear-gradient(135deg, var(--ms-blue), var(--ms-blue-2));
+      color:white;
+      box-shadow: 0 14px 30px rgba(0,120,212,.25);
+      min-width: 220px;
+    }
+
+    .btn-primary:hover{box-shadow: 0 16px 34px rgba(0,120,212,.32)}
+    .btn-primary:active{transform: translateY(1px)}
+
+    .btn-secondary{
+      background:#fff;
+      border:1px solid var(--border);
+      color:var(--text);
+      font-weight:700;
+      padding:12px 14px;
+    }
+
+    .toast{
+      display:none;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(22,163,74,.25);
+      background: rgba(22,163,74,.08);
+      color: #0b3d1f;
+      font-weight:700;
+      font-size:14px;
+    }
+
+    .toast.show{display:inline-flex}
+
+    .sidebar{
+      padding:18px 18px 16px;
+    }
+
+    .sidebar h3{
+      margin:0 0 10px;
+      font-size:16px;
+      letter-spacing:-.2px;
+    }
+
+    .steps{
+      list-style:none;
+      padding:0; margin:0;
+      display:grid;
+      gap:10px;
+    }
+
+    .step{
+      display:flex;
+      gap:12px;
+      padding:12px 12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:#fff;
+    }
+
+    .step .icon{
+      width:36px;height:36px;
+      border-radius:12px;
+      display:grid;
+      place-items:center;
+      background: rgba(0,120,212,.10);
+      color:var(--ms-blue);
+      font-size:18px;
+      flex:0 0 auto;
+    }
+
+    .step b{display:block; margin-bottom:3px}
+    .step span{color:var(--muted); font-size:14px}
+
+    .sections{
+      margin-top:22px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+    }
+
+    @media (max-width: 920px){
+      .sections{grid-template-columns: 1fr}
+    }
+
+    .section{
+      padding:18px;
+    }
+
+    .section h3{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:0 0 10px;
+      font-size:16px;
+    }
+
+    .section p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .callout{
+      margin-top:14px;
+      border-radius:14px;
+      border:1px dashed var(--border);
+      background: rgba(255,255,255,.6);
+      padding:12px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .footer{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      padding:2px 7px;
+      border-radius:8px;
+      border:1px solid var(--border);
+      background:#fff;
+      color:#0b1220;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .tiny{
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .divider{
+      height:1px;
+      background:var(--border);
+      margin:16px 0;
+    }
+
+    /* Accessibility focus */
+    .btn:focus-visible, .linklike:focus-visible{
+      outline: 3px solid rgba(0,120,212,.35);
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand" aria-label="Marca">
+        <div class="brand-badge" aria-hidden="true">🟦</div>
+        <div>
+          <div>Asistente de Actividad Laboral</div>
+          <div class="tiny">Copiar · Pegar · Listo</div>
+        </div>
+      </div>
+      <div class="pill" title="Sin instalaciones, sin permisos admin, 100% transparente">
+        ✅ 100% sin instalaciones · 🔒 Transparente · 🧩 Sin permisos de administrador
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Main -->
+      <section class="card">
+        <div class="hero">
+          <h1>Asistente de Actividad Laboral</h1>
+          <p>
+            Mantén tu equipo activo de forma <b>segura</b> y <b>sin instalar nada</b>.
+            Solo copia y pega un comando en PowerShell (la ventana azul).
+          </p>
+
+          <div class="trust" aria-label="Indicadores de confianza">
+            <span class="mini">🔍 Código visible</span>
+            <span class="mini">🗂️ No toca archivos</span>
+            <span class="mini">⌨️ Simula Scroll Lock</span>
+            <span class="mini">⏱️ Cada 4 minutos</span>
+          </div>
+        </div>
+
+        <div class="code-card">
+          <div class="code-header">
+            <div>
+              <h2>1) Copia este comando (una sola línea)</h2>
+              <p>Después solo tendrás que pegarlo en PowerShell y pulsar Enter.</p>
+            </div>
+          </div>
+
+          <div class="code-block" role="region" aria-label="Bloque de código">
+            <pre id="psCode">$w = New-Object -ComObject WScript.Shell; while($true) { $w.SendKeys('{SCROLLLOCK}'); Start-Sleep -Seconds 240 }</pre>
+          </div>
+
+          <div class="code-actions">
+            <button id="copyBtn" class="btn btn-primary" type="button" aria-live="polite">
+              📋 Copiar Código
+            </button>
+
+            <span id="toast" class="toast" role="status" aria-live="polite">
+              ✅ ¡Copiado!
+            </span>
+
+            <button id="selectBtn" class="btn btn-secondary" type="button">
+              ✨ Seleccionar texto
+            </button>
+          </div>
+
+          <div class="callout" aria-label="Nota">
+            💡 Consejo: si el botón de copiar no funciona por políticas del navegador, usa <b>“Seleccionar texto”</b> y luego <span class="kbd">Ctrl</span> + <span class="kbd">C</span>.
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="footer">
+            <div>🧠 Hecho para personas sin conocimientos técnicos.</div>
+            <div>Compatible con Windows (PowerShell).</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sidebar -->
+      <aside class="card sidebar">
+        <h3>Guía rápida (3 pasos)</h3>
+        <ol class="steps">
+          <li class="step">
+            <div class="icon" aria-hidden="true">1️⃣</div>
+            <div>
+              <b>Haz clic en “Copiar Código”</b>
+              <span>El comando quedará en tu portapapeles.</span>
+            </div>
+          </li>
+          <li class="step">
+            <div class="icon" aria-hidden="true">2️⃣</div>
+            <div>
+              <b>Abre PowerShell</b>
+              <span>Pulsa <b>Inicio</b>, escribe <b>PowerShell</b> y abre la app (ventana azul).</span>
+            </div>
+          </li>
+          <li class="step">
+            <div class="icon" aria-hidden="true">3️⃣</div>
+            <div>
+              <b>Pega y ejecuta</b>
+              <span>Haz clic derecho dentro de la ventana azul para pegar y pulsa <b>Enter</b>.</span>
+            </div>
+          </li>
+        </ol>
+
+        <div class="sections">
+          <section class="card section" style="box-shadow:none">
+            <h3>🔒 Seguridad</h3>
+            <p>
+              El código es <b>transparente</b>: no descarga nada, no accede a tus archivos
+              y no envía datos. Solo simula una pulsación de tecla invisible
+              (<b>Scroll Lock</b>) cada <b>4 minutos</b>.
+            </p>
+          </section>
+
+          <section class="card section" style="box-shadow:none">
+            <h3>⛔ Cómo detenerlo</h3>
+            <p>
+              Para parar el proceso, simplemente:
+              <br><br>
+              • Cierra la ventana azul (PowerShell), o<br>
+              • Pulsa <span class="kbd">Ctrl</span> + <span class="kbd">C</span> dentro de PowerShell.
+            </p>
+          </section>
+        </div>
+
+        <div class="callout" aria-label="Aviso">
+          ⚠️ Nota: este tipo de uso puede estar regulado por políticas internas de tu empresa. Úsalo con criterio.
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const code = "$w = New-Object -ComObject WScript.Shell; while($true) { $w.SendKeys('{SCROLLLOCK}'); Start-Sleep -Seconds 240 }";
+      const copyBtn = document.getElementById("copyBtn");
+      const selectBtn = document.getElementById("selectBtn");
+      const toast = document.getElementById("toast");
+      const psCode = document.getElementById("psCode");
+
+      let toastTimer = null;
+
+      function showToast() {
+        toast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 1400);
+      }
+
+      async function copyToClipboard(text) {
+        // Prefer modern Clipboard API (requires secure context: https / localhost)
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+
+        // Fallback: select + execCommand
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.opacity = "0";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        textarea.setSelectionRange(0, textarea.value.length);
+        const ok = document.execCommand("copy");
+        document.body.removeChild(textarea);
+        return ok;
+      }
+
+      function selectCode() {
+        const range = document.createRange();
+        range.selectNodeContents(psCode);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
+      copyBtn.addEventListener("click", async () => {
+        try {
+          const ok = await copyToClipboard(code);
+          if (ok) showToast();
+          else {
+            // If copy failed, still help by selecting the code
+            selectCode();
+            toast.textContent = "📌 Seleccionado (Ctrl + C)";
+            showToast();
+            setTimeout(() => { toast.textContent = "✅ ¡Copiado!"; }, 1600);
+          }
+        } catch (e) {
+          // If clipboard throws (policy), select code as a reliable fallback
+          selectCode();
+          toast.textContent = "📌 Seleccionado (Ctrl + C)";
+          showToast();
+          setTimeout(() => { toast.textContent = "✅ ¡Copiado!"; }, 1600);
+        }
+      });
+
+      selectBtn.addEventListener("click", () => {
+        selectCode();
+        toast.textContent = "📌 Seleccionado";
+        showToast();
+        setTimeout(() => { toast.textContent = "✅ ¡Copiado!"; }, 1600);
+      });
+
+      // Small UX: allow click on code block to select
+      psCode.addEventListener("click", selectCode);
+    })();
+  </script>
+</body>
+</html>
