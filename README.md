@@ -1,4 +1,5 @@
 # Abre MiAutoClicker.exe (puede pedir permiso de administrador para teclas rápidas).
+.
 
 
 # Rellena:
